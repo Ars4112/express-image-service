@@ -1,19 +1,22 @@
 import "dotenv/config";
 import express from "express";
-import { avatarController } from "./controllers/avatar.controller";
-
-import multer from "multer";
+import { image } from "./routers/image.router";
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const upload = multer({ storage: multer.memoryStorage() });
+app.use(
+	cors({
+		origin: ["http://localhost:3002", "http://localhost:8081"],
+		methods: ["GET", "POST", "DELETE", "PUT"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+);
 
 app.use(express.json());
 
-app.post("/upload", upload.single("image"), avatarController.uploadAvatar.bind(avatarController));
-app.get("/avatar/:key", avatarController.getAvatarByKey.bind(avatarController));
-app.delete("/avatar/:key", avatarController.deleteAvatarByKey.bind(avatarController));
+app.use("/avatar", image);
 
 app.listen(port, () => {
 	console.log(`Image storage service is running on http://localhost:${port}`);
